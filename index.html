@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Matematika +− Minecraft</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1rem;}
+#app{width:100%;max-width:420px;padding:0.5rem 0 1.5rem;font-family:'Courier New',Courier,monospace;background:#1a1a2e;border-radius:8px;color:#fff;}
+.screen{display:none;}.screen.active{display:block;}
+
+.mc-header{background:#5b8dd9;border-bottom:4px solid #3a6bb5;padding:14px 12px 0;position:relative;overflow:hidden;}
+.mc-sun{position:absolute;top:8px;right:16px;width:40px;height:40px;background:#ffd700;border:3px solid #b8860b;}
+.mc-clouds{display:flex;gap:8px;margin-bottom:6px;}
+.mc-cloud{background:#fff;width:48px;height:16px;border:2px solid #ccc;position:relative;}
+.mc-cloud::before{content:'';position:absolute;width:22px;height:22px;background:#fff;border:2px solid #ccc;top:-11px;left:8px;}
+.mc-title-row{text-align:center;padding-bottom:4px;}
+.mc-title{font-size:26px;color:#fff;text-shadow:3px 3px #000;letter-spacing:2px;}
+.mc-subtitle{font-size:12px;color:#b0d4ff;letter-spacing:1px;}
+.mc-grass-row{display:flex;height:20px;background:#5a9e32;border-top:3px solid #7dc744;}
+.mc-grass-block{flex:1;height:20px;background:#5a9e32;border-right:1px solid #4a8a28;}
+.mc-dirt-row{display:flex;height:16px;}
+.mc-dirt-block{flex:1;height:16px;background:#8B5E3C;border-right:1px solid #7a4f2e;}
+
+.inv-label{font-size:12px;color:#aaa;text-align:center;margin:10px 0 6px;letter-spacing:1px;}
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:320px;margin:0 auto 10px;padding:0 8px;}
+.range-btn{background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:10px 6px;cursor:pointer;text-align:center;transition:filter .1s;}
+.range-btn:hover{filter:brightness(1.3);}
+.range-btn.sel-range{background:#7c3aed;border-color:#a78bfa #4c1d95 #4c1d95 #a78bfa;}
+.range-btn .ri{font-size:20px;margin-bottom:3px;}
+.range-btn .rt{font-size:16px;color:#fff;text-shadow:2px 2px #000;line-height:1.2;}
+.range-btn .rs{font-size:10px;color:#aaa;}
+.range-btn.sel-range .rs{color:#ddd6fe;}
+.inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:320px;margin:0 auto 14px;padding:0 8px;}
+.inv-slot{background:#8B8B8B;border:3px solid;border-color:#fff #555 #555 #fff;padding:8px 4px 6px;cursor:pointer;text-align:center;transition:filter .1s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.inv-slot:hover{filter:brightness(1.2);}
+.inv-slot.selected{background:#5a9e32;border-color:#fff #2a6e02 #2a6e02 #fff;}
+.inv-slot .block-icon{margin-bottom:4px;font-size:22px;}
+.inv-slot .inv-num{font-size:22px;color:#fff;text-shadow:2px 2px #000;line-height:1;}
+.inv-slot .inv-lbl{font-size:10px;color:#ffe;text-shadow:1px 1px #000;}
+
+.mc-btn{display:block;width:calc(100% - 24px);max-width:300px;margin:0 auto 6px;padding:12px;font-size:17px;font-family:'Courier New',monospace;background:#5a9e32;color:#fff;border:3px solid;border-color:#fff #2a5e12 #2a5e12 #fff;cursor:pointer;letter-spacing:1px;text-shadow:2px 2px #000;transition:filter .1s;}
+.mc-btn:disabled{background:#555;border-color:#888 #333 #333 #888;opacity:.6;cursor:not-allowed;}
+.mc-btn:not(:disabled):hover{filter:brightness(1.15);}
+.mc-btn.blue-btn{background:#2874a6;border-color:#fff #0e3d5c #0e3d5c #fff;}
+.mc-btn.gray-btn{background:#555;border-color:#888 #333 #333 #888;color:#ccc;}
+.sound-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#aaa;margin:4px auto;cursor:pointer;}
+.sound-row input{cursor:pointer;}
+
+.quiz-inner{padding:8px 10px;}
+.mc-prog-wrap{background:#333;border:3px solid #555;height:22px;margin-bottom:8px;}
+.mc-prog-fill{height:16px;background:#5a9e32;margin:1px;transition:width .3s;}
+.hud-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;}
+.hud-box{background:#000;border:2px solid #555;padding:4px 8px;font-size:12px;color:#fff;text-shadow:1px 1px #222;white-space:nowrap;}
+.hud-box.green{color:#5a9e32;}
+.hud-box.purple{color:#a78bfa;}
+.q-card{background:#2c2c2c;border:4px solid;border-color:#888 #333 #333 #888;padding:18px 12px 14px;text-align:center;margin-bottom:8px;}
+.q-card.bump-ok{animation:bOk .3s;}
+.q-card.bump-no{animation:bNo .3s;}
+@keyframes bOk{50%{background:#2a5e12;transform:scale(1.04);}100%{background:#2c2c2c;}}
+@keyframes bNo{25%{transform:translateX(-6px);}75%{transform:translateX(6px);}100%{transform:translateX(0);}}
+.q-deco{font-size:18px;margin-bottom:4px;}
+.q-text{font-size:40px;color:#fff;text-shadow:3px 3px #000;letter-spacing:4px;}
+.fb-row{text-align:center;font-size:18px;min-height:32px;margin-bottom:4px;text-shadow:2px 2px #000;}
+.fb-row.ok{color:#5a9e32;}.fb-row.no{color:#e74c3c;}
+.answer-display{background:#000;border:4px solid;border-color:#555 #aaa #aaa #555;font-size:36px;font-family:'Courier New',monospace;color:#5a9e32;text-align:center;padding:10px 16px;margin:0 auto 8px;min-height:58px;letter-spacing:4px;max-width:280px;display:block;}
+.answer-display.hv{color:#fff;text-shadow:2px 2px #000;}
+.answer-display.shake{animation:bNo .3s;}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:280px;margin:0 auto 8px;padding:0 2px;}
+.nk{background:#3a3a3a;border:3px solid;border-color:#666 #222 #222 #666;font-size:22px;font-family:'Courier New',monospace;color:#fff;text-shadow:2px 2px #000;padding:14px 8px;cursor:pointer;text-align:center;transition:filter .08s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.nk:hover{filter:brightness(1.3);}
+.nk:active{filter:brightness(.8);transform:scale(.96);}
+.nk.back{background:#5c3a1a;border-color:#8B5e3C #2a1a08 #2a1a08 #8B5e3C;}
+.nk.enter{background:#2874a6;border-color:#5ba8d4 #0e3d5c #0e3d5c #5ba8d4;grid-column:span 3;font-size:18px;padding:12px 8px;letter-spacing:2px;}
+.nk.enter:hover{filter:brightness(1.2);}
+.nk.minus{background:#444;}
+.particles{position:relative;height:0;overflow:visible;pointer-events:none;}
+.particle{position:absolute;animation:pp .7s ease-out forwards;}
+@keyframes pp{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.1);}}
+
+/* ── RESULT ── */
+.result-inner{padding:10px 10px 4px;text-align:center;}
+.res-face{font-size:52px;margin-bottom:4px;animation:wgl .6s;display:block;}
+@keyframes wgl{25%{transform:rotate(-10deg);}75%{transform:rotate(10deg);}100%{transform:rotate(0);}}
+.star-row{display:flex;justify-content:center;gap:6px;margin-bottom:6px;}
+.star{width:32px;height:32px;}
+.res-score{font-size:52px;color:#fff;text-shadow:3px 3px #000;}
+.res-pct{font-size:16px;color:#aaa;margin-bottom:4px;}
+.res-msg{font-size:14px;color:#5a9e32;margin-bottom:10px;padding:0 8px;text-shadow:1px 1px #000;}
+
+/* ── REWARD ── */
+.reward-wrap{background:#0a0a18;border:4px solid;border-color:#ffd700 #7a5c00 #7a5c00 #ffd700;padding:14px 10px 12px;margin:0 4px 12px;position:relative;}
+.reward-top{text-align:center;margin-bottom:10px;}
+.reward-title{font-size:18px;color:#ffd700;text-shadow:2px 2px #000;letter-spacing:2px;}
+.reward-sub{font-size:11px;color:#aaa;margin-top:2px;letter-spacing:1px;}
+
+.big67{font-size:80px;color:#ffd700;text-shadow:4px 4px #000,0 0 20px #ff8c00;line-height:1;margin:4px 0 2px;animation:pulse67 1.5s ease-in-out infinite;}
+@keyframes pulse67{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.big67-label{font-size:13px;color:#EF9F27;letter-spacing:2px;margin-bottom:12px;}
+
+/* artifact grid */
+.artifact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+.artifact-cell{background:#1e1e1e;border:2px solid;border-color:#555 #222 #222 #555;padding:6px 4px;text-align:center;position:relative;}
+.artifact-cell .ac-icon{font-size:26px;display:block;margin-bottom:2px;}
+.artifact-cell .ac-name{font-size:9px;color:#888;letter-spacing:.5px;display:block;}
+.artifact-cell .ac-count{position:absolute;bottom:4px;right:5px;font-size:11px;color:#ffd700;text-shadow:1px 1px #000;}
+.artifact-cell.diamond{border-color:#44aaff #0a4a7a #0a4a7a #44aaff;background:#051830;}
+.artifact-cell.gold{border-color:#ffd700 #7a5c00 #7a5c00 #ffd700;background:#1a1200;}
+.artifact-cell.emerald{border-color:#44ee88 #0a5a28 #0a5a28 #44ee88;background:#051a0e;}
+.artifact-cell.redstone{border-color:#ff4444 #7a0000 #7a0000 #ff4444;background:#180404;}
+.artifact-cell.iron{border-color:#bbbbbb #555 #555 #bbbbbb;background:#141414;}
+.artifact-cell.lapis{border-color:#4488ff #102080 #102080 #4488ff;background:#060c24;}
+.artifact-cell.netherite{border-color:#888 #333 #333 #888;background:#0c0c0c;}
+.artifact-cell.obsidian{border-color:#9966cc #3a1a5c #3a1a5c #9966cc;background:#0a0010;}
+
+.reward-lore{background:#111;border:2px solid #333;padding:8px 10px;margin-top:4px;font-size:12px;color:#aaa;text-align:left;line-height:1.6;}
+.reward-lore .lore-line{display:flex;justify-content:space-between;}
+.reward-lore .lore-line .lk{color:#5a9e32;}
+.reward-lore .lore-line .lv{color:#ffd700;}
+.reward-lore .lore-sep{border-top:1px solid #333;margin:4px 0;}
+
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="s-home" class="screen active">
+  <div class="mc-header">
+    <div class="mc-sun"></div>
+    <div class="mc-clouds">
+      <div class="mc-cloud"></div>
+      <div class="mc-cloud" style="width:36px;margin-top:4px;"></div>
+      <div class="mc-cloud" style="width:56px;"></div>
+    </div>
+    <div class="mc-title-row">
+      <div class="mc-title">MATEMATIKA</div>
+      <div class="mc-subtitle" id="hdr-sub">+  -  DO  100</div>
+    </div>
+    <div class="mc-grass-row"><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div><div class="mc-grass-block"></div></div>
+    <div class="mc-dirt-row"><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div></div>
+  </div>
+  <div class="inv-label">[ OBTIZNOST ]</div>
+  <div class="range-row">
+    <div class="range-btn" onclick="pickRange(20,this)">
+      <div class="ri">🌱</div><div class="rt">DO 20</div><div class="rs">zacatecnik</div>
+    </div>
+    <div class="range-btn" onclick="pickRange(100,this)">
+      <div class="ri">💎</div><div class="rt">DO 100</div><div class="rs">pokrocily</div>
+    </div>
+  </div>
+  <div class="inv-label">[ POCET PRIKLADU ]</div>
+  <div class="inv-grid">
+    <div class="inv-slot" onclick="pickCount(10,this)"><div class="block-icon">⭐</div><div class="inv-num">10</div><div class="inv-lbl">prikladu</div></div>
+    <div class="inv-slot" onclick="pickCount(20,this)"><div class="block-icon">🌟</div><div class="inv-num">20</div><div class="inv-lbl">prikladu</div></div>
+    <div class="inv-slot" onclick="pickCount(30,this)"><div class="block-icon">🔥</div><div class="inv-num">30</div><div class="inv-lbl">prikladu</div></div>
+    <div class="inv-slot" onclick="pickCount(40,this)"><div class="block-icon">🏆</div><div class="inv-num">40</div><div class="inv-lbl">prikladu</div></div>
+  </div>
+  <button class="mc-btn" id="start-btn" onclick="startGame()" disabled>[ HRAT! ]</button>
+  <label class="sound-row"><input type="checkbox" id="snd-toggle" checked> [ ZVUKY: ZAP ]</label>
+</div>
+
+<!-- QUIZ -->
+<div id="s-quiz" class="screen">
+  <div class="quiz-inner">
+    <div class="mc-prog-wrap"><div class="mc-prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="hud-row">
+      <div class="hud-box" id="qcount">PRIKLAD 1/10</div>
+      <div class="hud-box purple" id="qrange">DO 100</div>
+      <div class="hud-box green" id="qscore">SPRAVNE: 0</div>
+    </div>
+    <div class="q-card" id="qcard">
+      <div class="q-deco" id="qdeco">⛏️</div>
+      <div class="q-text" id="qtext">__ + __ = ?</div>
+    </div>
+    <div class="particles" id="particles"></div>
+    <div class="fb-row" id="fb"></div>
+    <div class="answer-display" id="ans-display">_</div>
+    <div class="numpad">
+      <div class="nk" onclick="nkPress('7')">7</div>
+      <div class="nk" onclick="nkPress('8')">8</div>
+      <div class="nk" onclick="nkPress('9')">9</div>
+      <div class="nk" onclick="nkPress('4')">4</div>
+      <div class="nk" onclick="nkPress('5')">5</div>
+      <div class="nk" onclick="nkPress('6')">6</div>
+      <div class="nk" onclick="nkPress('1')">1</div>
+      <div class="nk" onclick="nkPress('2')">2</div>
+      <div class="nk" onclick="nkPress('3')">3</div>
+      <div class="nk minus" onclick="nkPress('-')">-</div>
+      <div class="nk" onclick="nkPress('0')">0</div>
+      <div class="nk back" onclick="nkBack()">&#9003;</div>
+      <div class="nk enter" onclick="doSubmit()">[ ENTER = POTVRDIT ]</div>
+    </div>
+    <button class="mc-btn gray-btn" style="margin-top:4px;" onclick="doEnd()">[ UKONCIT ]</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="s-result" class="screen">
+  <div class="result-inner">
+    <span class="res-face" id="rface"></span>
+    <div class="star-row" id="stars"></div>
+    <div class="res-score" id="rscore"></div>
+    <div class="res-pct" id="rpct"></div>
+    <div class="res-msg" id="rmsg"></div>
+
+    <div class="reward-wrap" id="reward-wrap" style="display:none;">
+      <div class="reward-top">
+        <div class="reward-title">*** PERFECT SCORE! ***</div>
+        <div class="reward-sub">ZISKANO ZA PERFEKTNI SKORE</div>
+      </div>
+      <div class="big67" id="big67num">67</div>
+      <div class="big67-label" id="big67label">DIAMANTU</div>
+      <div class="artifact-grid" id="artifact-grid"></div>
+      <div class="reward-lore" id="reward-lore"></div>
+    </div>
+
+    <button class="mc-btn" onclick="replayGame()">[ ZNOVU! ]</button>
+    <button class="mc-btn gray-btn" onclick="goHome()">[ ZPET DOMU ]</button>
+  </div>
+</div>
+</div>
+
+<script>
+/* ── REWARD THEMES ── */
+const REWARD_THEMES = [
+  {
+    title:'DIAMANTOVA ODMENA',
+    bigNum:'67',
+    bigLabel:'DIAMANTU',
+    artifacts:[
+      {icon:'💎',name:'diamant',count:'x67',cls:'diamond'},
+      {icon:'⛏️',name:'diam. krumpac',count:'x1',cls:'diamond'},
+      {icon:'🗡️',name:'diam. mec',count:'x1',cls:'diamond'},
+      {icon:'🛡️',name:'diam. brneni',count:'x1',cls:'diamond'},
+      {icon:'🪖',name:'diam. helma',count:'x1',cls:'diamond'},
+      {icon:'👢',name:'diam. boty',count:'x1',cls:'diamond'},
+      {icon:'🏹',name:'luk',count:'x67',cls:'iron'},
+      {icon:'✨',name:'zkusenosti',count:'x67',cls:'emerald'},
+    ],
+    lore:[
+      {k:'Celkem diamantu',v:'67'},
+      {k:'Vzacnost',v:'LEGENDARY'},
+      {k:'Enchant',v:'Fortune III'},
+      {k:'Bonus XP',v:'+670'},
+    ]
+  },
+  {
+    title:'ZLATA POKLADNICE',
+    bigNum:'67',
+    bigLabel:'ZLATYCH CIHEL',
+    artifacts:[
+      {icon:'🥇',name:'zlata cihla',count:'x67',cls:'gold'},
+      {icon:'⚔️',name:'zlaty mec',count:'x1',cls:'gold'},
+      {icon:'👑',name:'zlata koruna',count:'x1',cls:'gold'},
+      {icon:'🪙',name:'zlate mince',count:'x67',cls:'gold'},
+      {icon:'🌟',name:'zlata jablko',count:'x6',cls:'gold'},
+      {icon:'🔑',name:'klic od truhly',count:'x7',cls:'iron'},
+      {icon:'📦',name:'pokladni truhla',count:'x1',cls:'gold'},
+      {icon:'✨',name:'bonus XP',count:'x670',cls:'emerald'},
+    ],
+    lore:[
+      {k:'Zlatych cihel',v:'67'},
+      {k:'Vzacnost',v:'EPIC'},
+      {k:'Enchant',v:'Luck of the Sea'},
+      {k:'Bonus zlato',v:'+67%'},
+    ]
+  },
+  {
+    title:'EMERALDOVY OBCHOD',
+    bigNum:'67',
+    bigLabel:'EMERALDU',
+    artifacts:[
+      {icon:'💚',name:'emerald',count:'x67',cls:'emerald'},
+      {icon:'🌿',name:'vesnice',count:'x1',cls:'emerald'},
+      {icon:'🏺',name:'vesnicane',count:'x67',cls:'emerald'},
+      {icon:'📚',name:'knihy kouzel',count:'x7',cls:'lapis'},
+      {icon:'🗺️',name:'mapa pokladu',count:'x6',cls:'gold'},
+      {icon:'🪄',name:'hole',count:'x1',cls:'lapis'},
+      {icon:'🔮',name:'lektvar',count:'x67',cls:'redstone'},
+      {icon:'✨',name:'obchodni bonus',count:'x67%',cls:'emerald'},
+    ],
+    lore:[
+      {k:'Emeraldu',v:'67'},
+      {k:'Vzacnost',v:'RARE'},
+      {k:'Enchant',v:'Mending'},
+      {k:'Sleva v obchode',v:'-67%'},
+    ]
+  },
+  {
+    title:'NETHERITOVA LEGENDA',
+    bigNum:'67',
+    bigLabel:'NETHERITE INGOTU',
+    artifacts:[
+      {icon:'🖤',name:'netherite',count:'x67',cls:'netherite'},
+      {icon:'⚔️',name:'neth. mec',count:'x1',cls:'netherite'},
+      {icon:'🛡️',name:'neth. brneni',count:'x1',cls:'netherite'},
+      {icon:'🔥',name:'ohen',count:'x67',cls:'redstone'},
+      {icon:'👹',name:'blazing rod',count:'x7',cls:'redstone'},
+      {icon:'🌋',name:'nether star',count:'x6',cls:'gold'},
+      {icon:'💀',name:'wither skull',count:'x1',cls:'netherite'},
+      {icon:'✨',name:'soul XP',count:'x670',cls:'obsidian'},
+    ],
+    lore:[
+      {k:'Netherite ingotu',v:'67'},
+      {k:'Vzacnost',v:'MYTHIC'},
+      {k:'Enchant',v:'Fire Aspect III'},
+      {k:'Fire resistance',v:'+67min'},
+    ]
+  },
+  {
+    title:'OKOUZLENE KOUZELNICTVI',
+    bigNum:'67',
+    bigLabel:'KOUZELNYCH KNIH',
+    artifacts:[
+      {icon:'📖',name:'kouzelna kniha',count:'x67',cls:'lapis'},
+      {icon:'🪄',name:'hole',count:'x6',cls:'lapis'},
+      {icon:'🔮',name:'magicka kula',count:'x7',cls:'obsidian'},
+      {icon:'💜',name:'lapis lazuli',count:'x67',cls:'lapis'},
+      {icon:'⚗️',name:'varici stojan',count:'x1',cls:'redstone'},
+      {icon:'🌀',name:'portal',count:'x1',cls:'obsidian'},
+      {icon:'🎇',name:'ohnostroj',count:'x67',cls:'redstone'},
+      {icon:'✨',name:'magicny XP',count:'x670',cls:'emerald'},
+    ],
+    lore:[
+      {k:'Kouzelnych knih',v:'67'},
+      {k:'Vzacnost',v:'LEGENDARY'},
+      {k:'Max level',v:'Enchant 67'},
+      {k:'Mana bonus',v:'+670'},
+    ]
+  },
+  {
+    title:'REDSTONE INZENYRSTVI',
+    bigNum:'67',
+    bigLabel:'REDSTONE PRASKU',
+    artifacts:[
+      {icon:'🔴',name:'redstone',count:'x67',cls:'redstone'},
+      {icon:'⚙️',name:'piston',count:'x7',cls:'iron'},
+      {icon:'🔋',name:'redstone blok',count:'x6',cls:'redstone'},
+      {icon:'💡',name:'svetlo',count:'x67',cls:'gold'},
+      {icon:'🕹️',name:'paka',count:'x7',cls:'iron'},
+      {icon:'🔔',name:'zvonek',count:'x6',cls:'gold'},
+      {icon:'🤖',name:'golem',count:'x1',cls:'iron'},
+      {icon:'✨',name:'mechanicky XP',count:'x670',cls:'redstone'},
+    ],
+    lore:[
+      {k:'Redstone prasku',v:'67'},
+      {k:'Vzacnost',v:'EPIC'},
+      {k:'Mechanika',v:'Ultra x67'},
+      {k:'Power bonus',v:'+67W'},
+    ]
+  },
+];
+
+function starSVG(f){
+  const c=f?'#EF9F27':'#444';
+  return`<svg class="star" viewBox="0 0 32 32" fill="${c}"><polygon points="16,2 20,12 30,12 22,19 25,29 16,22 7,29 10,19 2,12 12,12"/></svg>`;
+}
+const DECOS=['⛏️','💎','🪓','🗡️','🏹','🧱','🪨','🌲'];
+const MSGS_OK=['SPRAVNE!','BRAVO!','SUPER!','JEDNICKA!','SKVELE!','PERFEKTNI!','UZASNE!','GENIALNI!'];
+const MSGS_NO=['SPATNE','SKODA','NEVADI!','PRISTE LIP!'];
+
+let actx=null;
+function getACtx(){if(!actx)try{actx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return actx;}
+function soundOn(){return document.getElementById('snd-toggle').checked;}
+function tone(f,d,type,vol,delay){
+  const c=getACtx();if(!c||!soundOn())return;
+  const o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);
+  o.type=type||'square';
+  const t=c.currentTime+(delay||0);
+  o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol||0.2,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+d);
+  o.start(t);o.stop(t+d);
+}
+function sndKey(){tone(330,.04,'square',.1,0);}
+function sndBack(){tone(220,.04,'square',.08,0);}
+function sndCorrect(){tone(523,.1,'square',.2,0);tone(659,.1,'square',.2,.1);tone(784,.15,'square',.2,.2);}
+function sndWrong(){tone(200,.15,'sawtooth',.2,0);tone(160,.2,'sawtooth',.2,.16);}
+function sndStart(){tone(330,.08,'square',.2,0);tone(440,.08,'square',.2,.1);tone(550,.12,'square',.2,.2);}
+function sndFanfare(){
+  [523,659,784,1047].forEach((f,i)=>tone(f,.18,'square',.22,i*.14));
+  setTimeout(()=>[784,1047,1319,1568].forEach((f,i)=>tone(f,.2,'square',.2,i*.1)),750);
+}
+function sndSelect(){tone(440,.07,'square',.12,0);}
+function sndEmpty(){tone(180,.08,'sawtooth',.12,0);}
+
+function spawnParticles(good){
+  const p=document.getElementById('particles');p.innerHTML='';
+  const colors=good?['#5a9e32','#EF9F27','#44CCEE','#c0392b','#C040E0']:['#c0392b','#8B5E3C'];
+  for(let i=0;i<(good?20:7);i++){
+    const d=document.createElement('div');d.className='particle';
+    const sz=6+Math.floor(Math.random()*8);
+    const dx=(Math.random()-.5)*160,dy=-(Math.random()*110+30);
+    d.style.cssText=`left:${30+Math.random()*40}%;width:${sz}px;height:${sz}px;background:${colors[i%colors.length]};--dx:${dx}px;--dy:${dy}px;animation-delay:${Math.random()*.08}s;`;
+    p.appendChild(d);
+  }
+  setTimeout(()=>p.innerHTML='',900);
+}
+
+let selCount=0,lastCount=10,selRange=100,lastRange=100;
+let questions=[],cur=0,ok=0;
+let currentInput='',canInput=true;
+let rewardIdx=0;
+
+function pickRange(n,el){
+  selRange=n;lastRange=n;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('sel-range'));
+  el.classList.add('sel-range');
+  document.getElementById('hdr-sub').textContent='+  -  DO  '+n;
+  sndSelect();checkReady();
+}
+function pickCount(n,el){
+  selCount=n;lastCount=n;
+  document.querySelectorAll('.inv-slot').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  sndSelect();checkReady();
+}
+function checkReady(){
+  document.getElementById('start-btn').disabled=!(selCount>0&&selRange>0);
+}
+function updateDisplay(){
+  const el=document.getElementById('ans-display');
+  if(currentInput===''){el.textContent='_';el.classList.remove('hv');}
+  else{el.textContent=currentInput;el.classList.add('hv');}
+}
+function nkPress(ch){
+  if(!canInput)return;
+  if(ch==='-'){
+    if(currentInput===''){currentInput='-';sndKey();}
+    else if(currentInput==='-'){currentInput='';sndBack();}
+    else if(!currentInput.startsWith('-')){currentInput='-'+currentInput;sndKey();}
+    else{currentInput=currentInput.slice(1);sndBack();}
+  }else{
+    if(currentInput.replace('-','').length>=3){sndEmpty();return;}
+    currentInput+=ch;sndKey();
+  }
+  updateDisplay();
+}
+function nkBack(){
+  if(!canInput)return;
+  if(currentInput.length>0){currentInput=currentInput.slice(0,-1);sndBack();}
+  updateDisplay();
+}
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('s-quiz').classList.contains('active')){
+    if(e.key>='0'&&e.key<='9')nkPress(e.key);
+    else if(e.key==='-')nkPress('-');
+    else if(e.key==='Backspace'){e.preventDefault();nkBack();}
+    else if(e.key==='Enter')doSubmit();
+  }
+});
+function makeQ(){
+  const plus=Math.random()<.5;
+  const max=selRange;
+  let a,b;
+  if(plus){a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(max-a+1));}
+  else{a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(a+1));}
+  return{text:a+(plus?' + ':' - ')+b,ans:plus?a+b:a-b};
+}
+function startGame(){
+  questions=Array.from({length:selCount},makeQ);
+  cur=0;ok=0;
+  document.getElementById('qrange').textContent='DO '+selRange;
+  sndStart();show('s-quiz');loadQ();
+}
+function loadQ(){
+  canInput=true;currentInput='';updateDisplay();
+  const q=questions[cur];
+  document.getElementById('qtext').textContent=q.text+' = ?';
+  document.getElementById('qdeco').textContent=DECOS[cur%DECOS.length];
+  document.getElementById('qcount').textContent='PRIKLAD '+(cur+1)+'/'+questions.length;
+  document.getElementById('qscore').textContent='SPRAVNE: '+ok;
+  document.getElementById('fb').textContent='';
+  document.getElementById('fb').className='fb-row';
+  document.getElementById('prog').style.width=Math.round(cur/questions.length*100)+'%';
+}
+function doSubmit(){
+  if(!canInput)return;
+  const v=parseInt(currentInput);
+  if(isNaN(v)||currentInput===''||currentInput==='-'){
+    const el=document.getElementById('ans-display');
+    el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),350);
+    sndEmpty();return;
+  }
+  canInput=false;
+  const isOk=v===questions[cur].ans;
+  if(isOk)ok++;
+  isOk?sndCorrect():sndWrong();
+  spawnParticles(isOk);
+  const card=document.getElementById('qcard');
+  card.classList.remove('bump-ok','bump-no');void card.offsetWidth;
+  card.classList.add(isOk?'bump-ok':'bump-no');
+  setTimeout(()=>card.classList.remove('bump-ok','bump-no'),400);
+  const msg=isOk?MSGS_OK[Math.floor(Math.random()*MSGS_OK.length)]:MSGS_NO[Math.floor(Math.random()*MSGS_NO.length)]+' = '+questions[cur].ans;
+  document.getElementById('fb').textContent=(isOk?'[+] ':' X  ')+msg;
+  document.getElementById('fb').className='fb-row '+(isOk?'ok':'no');
+  setTimeout(nextQ,800);
+}
+function nextQ(){cur++;if(cur>=questions.length)showResult();else loadQ();}
+function doEnd(){canInput=false;showResult();}
+function showResult(){
+  canInput=false;
+  document.getElementById('prog').style.width='100%';
+  const total=questions.length,pct=Math.round(ok/total*100);
+  document.getElementById('rscore').textContent=ok+' / '+total;
+  document.getElementById('rpct').textContent=pct+'%  SPRAVNYCH  |  DO '+lastRange;
+  let face,msg;
+  if(pct===100){face='🌟';msg='ABSOLUTNI JEDNICKA! MINECRAFT GENIUS!';}
+  else if(pct>=80){face='😀';msg='VYBORNE! SKORO PERFEKTNI!';}
+  else if(pct>=60){face='🙂';msg='DOBRA PRACE! PRISTE JESTE LEPE!';}
+  else if(pct>=40){face='💪';msg='NEVADI! CVICENI DELA MISTRA!';}
+  else{face='⛏️';msg='ZKUS TO ZNOVU, JDE TO!';}
+  document.getElementById('rface').textContent=face;
+  document.getElementById('rmsg').textContent=msg;
+  const filled=pct===100?5:pct>=80?4:pct>=60?3:pct>=40?2:1;
+  document.getElementById('stars').innerHTML=Array.from({length:5},(_,i)=>starSVG(i<filled)).join('');
+
+  const rw=document.getElementById('reward-wrap');
+  if(pct===100){
+    rw.style.display='block';
+    rewardIdx=(rewardIdx+1)%REWARD_THEMES.length;
+    const theme=REWARD_THEMES[rewardIdx];
+    document.getElementById('big67num').textContent='67';
+    document.getElementById('big67label').textContent=theme.bigLabel;
+    document.querySelector('.reward-title').textContent='*** '+theme.title+' ***';
+
+    const grid=document.getElementById('artifact-grid');
+    grid.innerHTML=theme.artifacts.map(a=>
+      `<div class="artifact-cell ${a.cls}">
+        <span class="ac-icon">${a.icon}</span>
+        <span class="ac-name">${a.name}</span>
+        <span class="ac-count">${a.count}</span>
+      </div>`
+    ).join('');
+
+    const lore=document.getElementById('reward-lore');
+    lore.innerHTML=theme.lore.map((l,i)=>
+      i>0?`<div class="lore-sep"></div><div class="lore-line"><span class="lk">${l.k}:</span><span class="lv">${l.v}</span></div>`
+      :`<div class="lore-line"><span class="lk">${l.k}:</span><span class="lv">${l.v}</span></div>`
+    ).join('');
+
+    setTimeout(sndFanfare,400);
+  }else{
+    rw.style.display='none';
+    if(pct>=80)setTimeout(()=>{tone(523,.12,'square',.2,0);tone(659,.18,'square',.2,.14);},300);
+  }
+  show('s-result');
+}
+function replayGame(){selCount=lastCount;selRange=lastRange;startGame();}
+function goHome(){
+  document.querySelectorAll('.inv-slot').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('sel-range'));
+  document.getElementById('start-btn').disabled=true;
+  selCount=0;selRange=100;
+  document.getElementById('hdr-sub').textContent='+  -  DO  100';
+  show('s-home');
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
