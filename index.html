@@ -187,7 +187,7 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
     </div>
   </div>
 
-  <!-- RANGE (only for calc mode) -->
+  <!-- RANGE (both modes) -->
   <div id="range-section">
     <div class="inv-label">[ OBTIZNOST ]</div>
     <div class="range-row">
@@ -402,22 +402,19 @@ function pickMode(mode,el){
   selMode=mode;
   document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active-tab'));
   el.classList.add('active-tab');
-  const rs=document.getElementById('range-section');
-  if(mode==='cmp'){
-    rs.style.display='none';
-    selRange=100;
-    document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  100';
-  }else{
-    rs.style.display='block';
-    document.getElementById('hdr-sub').textContent='+  -  DO  '+(selRange||100);
-  }
+  updateSubtitle();
   sndSelect();checkReady();
+}
+function updateSubtitle(){
+  if(!selRange){document.getElementById('hdr-sub').textContent=selMode==='cmp'?'VETSI  MENSI':'+ −';return;}
+  if(selMode==='cmp')document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  '+selRange;
+  else document.getElementById('hdr-sub').textContent='+  -  DO  '+selRange;
 }
 function pickRange(n,el){
   selRange=n;
   document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('sel-range'));
   el.classList.add('sel-range');
-  document.getElementById('hdr-sub').textContent='+  -  DO  '+n;
+  updateSubtitle();
   sndSelect();checkReady();
 }
 function pickCount(n,el){
@@ -427,8 +424,7 @@ function pickCount(n,el){
   sndSelect();checkReady();
 }
 function checkReady(){
-  const rangeOk=(selMode==='cmp')||selRange>0;
-  document.getElementById('start-btn').disabled=!(selCount>0&&rangeOk);
+  document.getElementById('start-btn').disabled=!(selCount>0&&selRange>0);
 }
 
 /* ── QUESTION GENERATORS ── */
@@ -441,8 +437,8 @@ function makeCalcQ(){
   return{type:'calc',text:a+(plus?' + ':' - ')+b+' = ?',ans:plus?a+b:a-b};
 }
 function makeCmpQ(){
-  const a=Math.floor(Math.random()*100)+1;
-  const b=Math.floor(Math.random()*100)+1;
+  const a=Math.floor(Math.random()*selRange)+1;
+  const b=Math.floor(Math.random()*selRange)+1;
   let ans;
   if(a<b)ans='<';
   else if(a>b)ans='>';
@@ -620,7 +616,8 @@ function goHome(){
   document.querySelectorAll('.inv-slot').forEach(b=>b.classList.remove('selected'));
   document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('sel-range'));
   document.getElementById('start-btn').disabled=true;
-  selCount=0;
+  selCount=0;selRange=0;
+  document.getElementById('hdr-sub').textContent='+  -  DO  100';
   show('s-home');
 }
 function show(id){
