@@ -10,7 +10,6 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 #app{width:100%;max-width:420px;padding:0.5rem 0 1.5rem;font-family:'Courier New',Courier,monospace;background:#1a1a2e;border-radius:8px;color:#fff;}
 .screen{display:none;}.screen.active{display:block;}
 
-/* HEADER */
 .mc-header{background:#5b8dd9;border-bottom:4px solid #3a6bb5;padding:14px 12px 0;position:relative;overflow:hidden;}
 .mc-sun{position:absolute;top:8px;right:16px;width:40px;height:40px;background:#ffd700;border:3px solid #b8860b;}
 .mc-clouds{display:flex;gap:8px;margin-bottom:6px;}
@@ -24,20 +23,22 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .mc-dirt-row{display:flex;height:16px;}
 .mc-dirt-block{flex:1;height:16px;background:#8B5E3C;border-right:1px solid #7a4f2e;}
 
-/* MODE TABS */
+/* TABS — 3 across */
 .mode-tabs{display:flex;gap:0;max-width:380px;margin:10px auto 0;padding:0 8px;}
-.mode-tab{flex:1;background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:10px 4px 8px;cursor:pointer;text-align:center;transition:filter .1s;border-right:none;}
+.mode-tab{flex:1;background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:9px 2px 7px;cursor:pointer;text-align:center;transition:filter .1s;border-right:none;}
 .mode-tab:last-child{border-right:3px solid #222;}
 .mode-tab:hover{filter:brightness(1.3);}
 .mode-tab.active-tab{background:#5a9e32;border-color:#7dc744 #2a5e12 #2a5e12 #7dc744;}
 .mode-tab.active-tab:last-child{border-right:3px solid #2a5e12;}
-.mode-tab .ti{font-size:20px;display:block;margin-bottom:2px;}
-.mode-tab .tl{font-size:10px;color:#ccc;letter-spacing:.5px;}
+.mode-tab .ti{font-size:18px;display:block;margin-bottom:2px;}
+.mode-tab .tl{font-size:9px;color:#ccc;letter-spacing:.3px;}
 .mode-tab.active-tab .tl{color:#fff;}
 
-/* LABELS + SLOTS */
 .inv-label{font-size:12px;color:#aaa;text-align:center;margin:10px 0 6px;letter-spacing:1px;}
-.range-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:320px;margin:0 auto 10px;padding:0 8px;}
+
+/* RANGE — 2 or 2 cols */
+.range-row{display:grid;gap:6px;max-width:320px;margin:0 auto 10px;padding:0 8px;}
+.range-row.cols2{grid-template-columns:1fr 1fr;}
 .range-btn{background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:10px 6px;cursor:pointer;text-align:center;transition:filter .1s;}
 .range-btn:hover{filter:brightness(1.3);}
 .range-btn.sel-range{background:#7c3aed;border-color:#a78bfa #4c1d95 #4c1d95 #a78bfa;}
@@ -45,9 +46,6 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .range-btn .rt{font-size:16px;color:#fff;text-shadow:2px 2px #000;line-height:1.2;}
 .range-btn .rs{font-size:10px;color:#aaa;}
 .range-btn.sel-range .rs{color:#ddd6fe;}
-
-/* hide range for compare mode */
-.range-hidden{display:none;}
 
 .inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:320px;margin:0 auto 14px;padding:0 8px;}
 .inv-slot{background:#8B8B8B;border:3px solid;border-color:#fff #555 #555 #fff;padding:8px 4px 6px;cursor:pointer;text-align:center;transition:filter .1s;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
@@ -57,13 +55,10 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .inv-slot .inv-num{font-size:22px;color:#fff;text-shadow:2px 2px #000;line-height:1;}
 .inv-slot .inv-lbl{font-size:10px;color:#ffe;text-shadow:1px 1px #000;}
 
-/* BUTTONS */
 .mc-btn{display:block;width:calc(100% - 24px);max-width:300px;margin:0 auto 6px;padding:12px;font-size:17px;font-family:'Courier New',monospace;background:#5a9e32;color:#fff;border:3px solid;border-color:#fff #2a5e12 #2a5e12 #fff;cursor:pointer;letter-spacing:1px;text-shadow:2px 2px #000;transition:filter .1s;}
 .mc-btn:disabled{background:#555;border-color:#888 #333 #333 #888;opacity:.6;cursor:not-allowed;}
 .mc-btn:not(:disabled):hover{filter:brightness(1.15);}
-.mc-btn.blue-btn{background:#2874a6;border-color:#fff #0e3d5c #0e3d5c #fff;}
 .mc-btn.gray-btn{background:#555;border-color:#888 #333 #333 #888;color:#ccc;}
-.mc-btn.orange-btn{background:#c0392b;border-color:#fff #7b1010 #7b1010 #fff;}
 .sound-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#aaa;margin:4px auto;cursor:pointer;}
 .sound-row input{cursor:pointer;}
 
@@ -72,10 +67,11 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .mc-prog-wrap{background:#333;border:3px solid #555;height:22px;margin-bottom:8px;}
 .mc-prog-fill{height:16px;background:#5a9e32;margin:1px;transition:width .3s;}
 .hud-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:4px;}
-.hud-box{background:#000;border:2px solid #555;padding:4px 7px;font-size:11px;color:#fff;text-shadow:1px 1px #222;white-space:nowrap;}
+.hud-box{background:#000;border:2px solid #555;padding:4px 7px;font-size:11px;color:#fff;white-space:nowrap;}
 .hud-box.green{color:#5a9e32;}
 .hud-box.purple{color:#a78bfa;}
 .hud-box.orange{color:#EF9F27;}
+.hud-box.gold{color:#ffd700;}
 
 .q-card{background:#2c2c2c;border:4px solid;border-color:#888 #333 #333 #888;padding:16px 12px 12px;text-align:center;margin-bottom:8px;}
 .q-card.bump-ok{animation:bOk .3s;}
@@ -83,9 +79,9 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 @keyframes bOk{50%{background:#2a5e12;transform:scale(1.04);}100%{background:#2c2c2c;}}
 @keyframes bNo{25%{transform:translateX(-6px);}75%{transform:translateX(6px);}100%{transform:translateX(0);}}
 .q-deco{font-size:16px;margin-bottom:2px;}
-.q-text{font-size:38px;color:#fff;text-shadow:3px 3px #000;letter-spacing:3px;}
+.q-text{font-size:36px;color:#fff;text-shadow:3px 3px #000;letter-spacing:2px;}
 
-/* COMPARE answer buttons */
+/* COMPARE buttons */
 .cmp-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:280px;margin:0 auto 8px;}
 .cmp-btn{background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;font-size:28px;font-family:'Courier New',monospace;color:#fff;padding:16px 8px;cursor:pointer;text-align:center;transition:filter .1s;text-shadow:2px 2px #000;user-select:none;-webkit-tap-highlight-color:transparent;}
 .cmp-btn:hover{filter:brightness(1.3);}
@@ -94,10 +90,10 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .cmp-btn.eq{background:#1a2a1a;border-color:#44aa44 #0a2a0a #0a2a0a #44aa44;}
 .cmp-btn.gt{background:#2a1a1a;border-color:#ff4444 #3a0a0a #3a0a0a #ff4444;}
 
-.fb-row{text-align:center;font-size:18px;min-height:32px;margin-bottom:4px;text-shadow:2px 2px #000;}
+.fb-row{text-align:center;font-size:16px;min-height:28px;margin-bottom:4px;text-shadow:2px 2px #000;}
 .fb-row.ok{color:#5a9e32;}.fb-row.no{color:#e74c3c;}
 
-/* NUMPAD (for +- mode) */
+/* NUMPAD */
 .numpad-wrap{display:none;}
 .numpad-wrap.show{display:block;}
 .answer-display{background:#000;border:4px solid;border-color:#555 #aaa #aaa #555;font-size:36px;font-family:'Courier New',monospace;color:#5a9e32;text-align:center;padding:10px 16px;margin:0 auto 8px;min-height:58px;letter-spacing:4px;max-width:280px;display:block;}
@@ -174,30 +170,22 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
     <div class="mc-dirt-row"><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div><div class="mc-dirt-block"></div></div>
   </div>
 
-  <!-- MODE TABS -->
   <div class="inv-label">[ TYP PRIKLADU ]</div>
   <div class="mode-tabs">
-    <div class="mode-tab active-tab" id="tab-calc" onclick="pickMode('calc',this)">
-      <span class="ti">➕</span>
-      <span class="tl">POCITANI</span>
+    <div class="mode-tab active-tab" onclick="pickMode('calc',this)">
+      <span class="ti">➕</span><span class="tl">POCITANI</span>
     </div>
-    <div class="mode-tab" id="tab-cmp" onclick="pickMode('cmp',this)">
-      <span class="ti">⚖️</span>
-      <span class="tl">POROVNAVANI</span>
+    <div class="mode-tab" onclick="pickMode('cmp',this)">
+      <span class="ti">⚖️</span><span class="tl">POROVNAVANI</span>
+    </div>
+    <div class="mode-tab" onclick="pickMode('mul',this)">
+      <span class="ti">✖️</span><span class="tl">NASOBILKA</span>
     </div>
   </div>
 
-  <!-- RANGE (both modes) -->
   <div id="range-section">
-    <div class="inv-label">[ OBTIZNOST ]</div>
-    <div class="range-row">
-      <div class="range-btn" onclick="pickRange(20,this)">
-        <div class="ri">🌱</div><div class="rt">DO 20</div><div class="rs">zacatecnik</div>
-      </div>
-      <div class="range-btn" onclick="pickRange(100,this)">
-        <div class="ri">💎</div><div class="rt">DO 100</div><div class="rs">pokrocily</div>
-      </div>
-    </div>
+    <div class="inv-label" id="range-label">[ OBTIZNOST ]</div>
+    <div class="range-row cols2" id="range-row"></div>
   </div>
 
   <div class="inv-label">[ POCET PRIKLADU ]</div>
@@ -228,14 +216,14 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
     <div class="particles" id="particles"></div>
     <div class="fb-row" id="fb"></div>
 
-    <!-- Compare answer buttons -->
+    <!-- Compare buttons -->
     <div class="cmp-btns" id="cmp-btns" style="display:none;">
-      <div class="cmp-btn lt" onclick="cmpAnswer('<')"> &lt; </div>
-      <div class="cmp-btn eq" onclick="cmpAnswer('=')"> = </div>
-      <div class="cmp-btn gt" onclick="cmpAnswer('>')"> &gt; </div>
+      <div class="cmp-btn lt" onclick="cmpAnswer('<')">&lt;</div>
+      <div class="cmp-btn eq" onclick="cmpAnswer('=')">=</div>
+      <div class="cmp-btn gt" onclick="cmpAnswer('>')">&gt;</div>
     </div>
 
-    <!-- Numpad for +- mode -->
+    <!-- Numpad (calc + mul mode) -->
     <div class="numpad-wrap" id="numpad-wrap">
       <div class="answer-display" id="ans-display">_</div>
       <div class="numpad">
@@ -284,6 +272,22 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 </div>
 
 <script>
+/* ── RANGE CONFIGS per mode ── */
+const RANGE_CONFIGS={
+  calc:[
+    {val:20,icon:'🌱',label:'DO 20',sub:'zacatecnik'},
+    {val:100,icon:'💎',label:'DO 100',sub:'pokrocily'},
+  ],
+  cmp:[
+    {val:20,icon:'🌱',label:'DO 20',sub:'zacatecnik'},
+    {val:100,icon:'💎',label:'DO 100',sub:'pokrocily'},
+  ],
+  mul:[
+    {val:20,icon:'⭐',label:'DO 20',sub:'nasobky 1-20'},
+    {val:50,icon:'🔥',label:'DO 50',sub:'nasobky 1-50'},
+  ],
+};
+
 /* ── REWARD THEMES ── */
 const REWARD_THEMES=[
   {title:'DIAMANTOVA ODMENA',label:'DIAMANTU',artifacts:[
@@ -302,7 +306,7 @@ const REWARD_THEMES=[
     {icon:'👑',name:'zlata koruna',count:'x1',cls:'gold'},
     {icon:'🪙',name:'zlate mince',count:'x67',cls:'gold'},
     {icon:'🌟',name:'zlate jablko',count:'x6',cls:'gold'},
-    {icon:'🔑',name:'klic od truhly',count:'x7',cls:'iron'},
+    {icon:'🔑',name:'klic truhly',count:'x7',cls:'iron'},
     {icon:'📦',name:'truhla',count:'x1',cls:'gold'},
     {icon:'✨',name:'XP bonus',count:'x670',cls:'emerald'},
   ],lore:[{k:'Zlatych cihel',v:'67'},{k:'Vzacnost',v:'EPIC'},{k:'Enchant',v:'Luck of Sea'},{k:'Bonus zlato',v:'+67%'}]},
@@ -350,6 +354,7 @@ const REWARD_THEMES=[
 
 const DECOS_CALC=['⛏️','💎','🪓','🗡️','🏹','🧱','🪨','🌲'];
 const DECOS_CMP=['⚖️','🔍','📏','🧮','🎯','🏆','⚔️','🛡️'];
+const DECOS_MUL=['✖️','🔢','🧮','📐','💡','⭐','🏆','🔥'];
 const MSGS_OK=['SPRAVNE!','BRAVO!','SUPER!','JEDNICKA!','SKVELE!','PERFEKTNI!','UZASNE!','GENIALNI!'];
 const MSGS_NO=['SPATNE','SKODA','NEVADI!','PRISTE LIP!'];
 
@@ -391,24 +396,40 @@ function spawnParticles(good){
   setTimeout(()=>p.innerHTML='',900);
 }
 
-let selCount=0,lastCount=10,selRange=100,lastRange=100;
+let selCount=0,lastCount=10,selRange=0,lastRange=100;
 let selMode='calc',lastMode='calc';
 let questions=[],cur=0,ok=0;
 let currentInput='',canInput=true;
 let rewardIdx=-1;
 let currentQ=null;
 
+/* ── BUILD RANGE BUTTONS for current mode ── */
+function buildRangeButtons(){
+  const cfg=RANGE_CONFIGS[selMode];
+  const row=document.getElementById('range-row');
+  row.innerHTML=cfg.map(r=>
+    `<div class="range-btn" onclick="pickRange(${r.val},this)">
+      <div class="ri">${r.icon}</div>
+      <div class="rt">${r.label}</div>
+      <div class="rs">${r.sub}</div>
+    </div>`
+  ).join('');
+  selRange=0;
+}
+
 function pickMode(mode,el){
   selMode=mode;
   document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active-tab'));
   el.classList.add('active-tab');
+  buildRangeButtons();
   updateSubtitle();
   sndSelect();checkReady();
 }
 function updateSubtitle(){
-  if(!selRange){document.getElementById('hdr-sub').textContent=selMode==='cmp'?'VETSI  MENSI':'+ −';return;}
-  if(selMode==='cmp')document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  '+selRange;
-  else document.getElementById('hdr-sub').textContent='+  -  DO  '+selRange;
+  const r=selRange||'?';
+  if(selMode==='calc') document.getElementById('hdr-sub').textContent='+  -  DO  '+r;
+  else if(selMode==='cmp') document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  '+r;
+  else document.getElementById('hdr-sub').textContent='x  ÷  DO  '+r;
 }
 function pickRange(n,el){
   selRange=n;
@@ -427,26 +448,7 @@ function checkReady(){
   document.getElementById('start-btn').disabled=!(selCount>0&&selRange>0);
 }
 
-/* ── QUESTION GENERATORS ── */
-function makeCalcQ(){
-  const plus=Math.random()<.5;
-  const max=selRange;
-  let a,b;
-  if(plus){a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(max-a+1));}
-  else{a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(a+1));}
-  return{type:'calc',text:a+(plus?' + ':' - ')+b+' = ?',ans:plus?a+b:a-b};
-}
-function makeCmpQ(){
-  const a=Math.floor(Math.random()*selRange)+1;
-  const b=Math.floor(Math.random()*selRange)+1;
-  let ans;
-  if(a<b)ans='<';
-  else if(a>b)ans='>';
-  else ans='=';
-  return{type:'cmp',text:a+' ___ '+b,a,b,ans};
-}
-
-/* ── DISPLAY ── */
+/* ── NUMPAD ── */
 function updateDisplay(){
   const el=document.getElementById('ans-display');
   if(currentInput===''){el.textContent='_';el.classList.remove('hv');}
@@ -460,7 +462,7 @@ function nkPress(ch){
     else if(!currentInput.startsWith('-')){currentInput='-'+currentInput;sndKey();}
     else{currentInput=currentInput.slice(1);sndBack();}
   }else{
-    if(currentInput.replace('-','').length>=3){sndEmpty();return;}
+    if(currentInput.replace('-','').length>=4){sndEmpty();return;}
     currentInput+=ch;sndKey();
   }
   updateDisplay();
@@ -472,26 +474,65 @@ function nkBack(){
 }
 document.addEventListener('keydown',function(e){
   if(!document.getElementById('s-quiz').classList.contains('active'))return;
-  if(selMode==='calc'){
+  if(selMode==='cmp'){
+    if(e.key==='<'||e.key===',')cmpAnswer('<');
+    else if(e.key==='>'||e.key==='.')cmpAnswer('>');
+    else if(e.key==='='||e.key==='0')cmpAnswer('=');
+  }else{
     if(e.key>='0'&&e.key<='9')nkPress(e.key);
     else if(e.key==='-')nkPress('-');
     else if(e.key==='Backspace'){e.preventDefault();nkBack();}
     else if(e.key==='Enter')doSubmit();
-  }else{
-    if(e.key==='<'||e.key===',')cmpAnswer('<');
-    else if(e.key==='>'||e.key==='.')cmpAnswer('>');
-    else if(e.key==='='||e.key==='0')cmpAnswer('=');
   }
 });
+
+/* ── QUESTION GENERATORS ── */
+function makeCalcQ(){
+  const plus=Math.random()<.5;
+  const max=selRange;
+  let a,b;
+  if(plus){a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(max-a+1));}
+  else{a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(a+1));}
+  return{type:'calc',text:a+(plus?' + ':' - ')+b+' = ?',ans:plus?a+b:a-b};
+}
+function makeCmpQ(){
+  const a=Math.floor(Math.random()*selRange)+1;
+  const b=Math.floor(Math.random()*selRange)+1;
+  const ans=a<b?'<':a>b?'>':'=';
+  return{type:'cmp',text:a+' ___ '+b,a,b,ans};
+}
+function makeMulQ(){
+  const max=selRange;
+  const doDiv=Math.random()<.5;
+  if(doDiv){
+    // pick a*b first, present as (a*b) ÷ a = ?
+    const a=Math.floor(Math.random()*10)+1;
+    const b=Math.floor(Math.random()*10)+1;
+    const product=a*b;
+    if(product>max){
+      // fallback to multiplication
+      const x=Math.floor(Math.random()*10)+1;
+      const y=Math.floor(Math.random()*Math.floor(max/x))+1;
+      return{type:'mul',text:x+' × '+y+' = ?',ans:x*y};
+    }
+    return{type:'mul',text:product+' ÷ '+a+' = ?',ans:b};
+  }else{
+    const a=Math.floor(Math.random()*10)+1;
+    const maxB=Math.floor(max/a);
+    const b=maxB<1?1:Math.floor(Math.random()*maxB)+1;
+    return{type:'mul',text:a+' × '+b+' = ?',ans:a*b};
+  }
+}
 
 /* ── GAME FLOW ── */
 function startGame(){
   lastMode=selMode;lastRange=selRange;lastCount=selCount;
-  questions=Array.from({length:selCount},selMode==='calc'?makeCalcQ:makeCmpQ);
+  let maker=selMode==='calc'?makeCalcQ:selMode==='cmp'?makeCmpQ:makeMulQ;
+  questions=Array.from({length:selCount},maker);
   cur=0;ok=0;
-  document.getElementById('qmode').textContent=selMode==='calc'?'+ −':'&gt; &lt;';
-  document.getElementById('qmode').innerHTML=selMode==='calc'?'+ &minus;':'&gt; &lt;';
-  document.getElementById('qrange').textContent='DO 100';
+  const modeLabel=selMode==='calc'?'+ −':selMode==='cmp'?'> <':'× ÷';
+  document.getElementById('qmode').textContent=modeLabel;
+  document.getElementById('qrange').textContent='DO '+selRange;
   sndStart();show('s-quiz');loadQ();
 }
 
@@ -499,7 +540,7 @@ function loadQ(){
   canInput=true;currentInput='';
   currentQ=questions[cur];
   document.getElementById('qtext').textContent=currentQ.text;
-  const decos=selMode==='calc'?DECOS_CALC:DECOS_CMP;
+  const decos=selMode==='calc'?DECOS_CALC:selMode==='cmp'?DECOS_CMP:DECOS_MUL;
   document.getElementById('qdeco').textContent=decos[cur%decos.length];
   document.getElementById('qcount').textContent='PRIKLAD '+(cur+1)+'/'+questions.length;
   document.getElementById('qscore').textContent='SPRAVNE: '+ok;
@@ -507,26 +548,23 @@ function loadQ(){
   document.getElementById('fb').className='fb-row';
   document.getElementById('prog').style.width=Math.round(cur/questions.length*100)+'%';
 
-  if(selMode==='calc'){
+  if(selMode==='cmp'){
+    document.getElementById('numpad-wrap').classList.remove('show');
+    document.getElementById('cmp-btns').style.display='grid';
+  }else{
     document.getElementById('numpad-wrap').classList.add('show');
     document.getElementById('cmp-btns').style.display='none';
     updateDisplay();
-  }else{
-    document.getElementById('numpad-wrap').classList.remove('show');
-    document.getElementById('cmp-btns').style.display='grid';
   }
 }
 
 function cmpAnswer(sym){
   if(!canInput)return;
-  canInput=false;
-  sndKey();
+  canInput=false;sndKey();
   const isOk=sym===currentQ.ans;
   if(isOk)ok++;
   isOk?sndCorrect():sndWrong();
-  spawnParticles(isOk);
-  bumpCard(isOk);
-  const symLabel=sym==='<'?' < ':sym==='>'?' > ':' = ';
+  spawnParticles(isOk);bumpCard(isOk);
   const correctLabel=currentQ.ans==='<'?' < ':currentQ.ans==='>'?' > ':' = ';
   const msg=isOk?MSGS_OK[Math.floor(Math.random()*MSGS_OK.length)]:MSGS_NO[Math.floor(Math.random()*MSGS_NO.length)]+' ['+currentQ.a+correctLabel+currentQ.b+']';
   document.getElementById('fb').textContent=(isOk?'[+] ':' X  ')+msg;
@@ -546,8 +584,7 @@ function doSubmit(){
   const isOk=v===currentQ.ans;
   if(isOk)ok++;
   isOk?sndCorrect():sndWrong();
-  spawnParticles(isOk);
-  bumpCard(isOk);
+  spawnParticles(isOk);bumpCard(isOk);
   const msg=isOk?MSGS_OK[Math.floor(Math.random()*MSGS_OK.length)]:MSGS_NO[Math.floor(Math.random()*MSGS_NO.length)]+' = '+currentQ.ans;
   document.getElementById('fb').textContent=(isOk?'[+] ':' X  ')+msg;
   document.getElementById('fb').className='fb-row '+(isOk?'ok':'no');
@@ -560,7 +597,6 @@ function bumpCard(isOk){
   card.classList.add(isOk?'bump-ok':'bump-no');
   setTimeout(()=>card.classList.remove('bump-ok','bump-no'),400);
 }
-
 function nextQ(){cur++;if(cur>=questions.length)showResult();else loadQ();}
 function doEnd(){canInput=false;showResult();}
 
@@ -574,8 +610,8 @@ function showResult(){
   document.getElementById('prog').style.width='100%';
   const total=questions.length,pct=Math.round(ok/total*100);
   document.getElementById('rscore').textContent=ok+' / '+total;
-  const modeLabel=lastMode==='calc'?'+ − DO '+lastRange:'POROVNAVANI';
-  document.getElementById('rpct').textContent=pct+'%  |  '+modeLabel;
+  const modeStr=lastMode==='calc'?'+ − DO '+lastRange:lastMode==='cmp'?'POROVNAVANI DO '+lastRange:'× ÷ DO '+lastRange;
+  document.getElementById('rpct').textContent=pct+'%  |  '+modeStr;
   let face,msg;
   if(pct===100){face='🌟';msg='ABSOLUTNI JEDNICKA! MINECRAFT GENIUS!';}
   else if(pct>=80){face='😀';msg='VYBORNE! SKORO PERFEKTNI!';}
@@ -607,23 +643,22 @@ function showResult(){
   }
   show('s-result');
 }
-
-function replayGame(){
-  selMode=lastMode;selRange=lastRange;selCount=lastCount;
-  startGame();
-}
+function replayGame(){selMode=lastMode;selRange=lastRange;selCount=lastCount;startGame();}
 function goHome(){
   document.querySelectorAll('.inv-slot').forEach(b=>b.classList.remove('selected'));
-  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('sel-range'));
   document.getElementById('start-btn').disabled=true;
   selCount=0;selRange=0;
-  document.getElementById('hdr-sub').textContent='+  -  DO  100';
+  buildRangeButtons();
+  updateSubtitle();
   show('s-home');
 }
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+
+// init range buttons on load
+buildRangeButtons();
 </script>
 </body>
 </html>
