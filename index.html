@@ -172,8 +172,11 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 
   <div class="inv-label">[ TYP PRIKLADU ]</div>
   <div class="mode-tabs">
-    <div class="mode-tab active-tab" onclick="pickMode('calc',this)">
-      <span class="ti">➕</span><span class="tl">POCITANI</span>
+    <div class="mode-tab active-tab" onclick="pickMode('plus',this)">
+      <span class="ti">➕</span><span class="tl">SCITANI</span>
+    </div>
+    <div class="mode-tab" onclick="pickMode('minus',this)">
+      <span class="ti">➖</span><span class="tl">ODCITANI</span>
     </div>
     <div class="mode-tab" onclick="pickMode('cmp',this)">
       <span class="ti">⚖️</span><span class="tl">POROVNAN.</span>
@@ -277,7 +280,11 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 <script>
 /* ── RANGE CONFIGS per mode ── */
 const RANGE_CONFIGS={
-  calc:[
+  plus:[
+    {val:20,icon:'🌱',label:'DO 20',sub:'zacatecnik'},
+    {val:100,icon:'💎',label:'DO 100',sub:'pokrocily'},
+  ],
+  minus:[
     {val:20,icon:'🌱',label:'DO 20',sub:'zacatecnik'},
     {val:100,icon:'💎',label:'DO 100',sub:'pokrocily'},
   ],
@@ -407,7 +414,7 @@ function spawnParticles(good){
 }
 
 let selCount=0,lastCount=10,selRange=0,lastRange=100;
-let selMode='calc',lastMode='calc';
+let selMode='plus',lastMode='plus';
 let questions=[],cur=0,ok=0;
 let currentInput='',canInput=true;
 let rewardIdx=-1;
@@ -438,7 +445,8 @@ function pickMode(mode,el){
 }
 function updateSubtitle(){
   const r=selRange||'?';
-  if(selMode==='calc') document.getElementById('hdr-sub').textContent='+  -  DO  '+r;
+  if(selMode==='plus') document.getElementById('hdr-sub').textContent='+  SCITANI  DO  '+r;
+  else if(selMode==='minus') document.getElementById('hdr-sub').textContent='-  ODCITANI  DO  '+r;
   else if(selMode==='cmp') document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  '+r;
   else if(selMode==='mul') document.getElementById('hdr-sub').textContent='x  (KRAT)  DO  '+r;
   else document.getElementById('hdr-sub').textContent='÷  (DELENO)  DO  '+r;
@@ -499,13 +507,17 @@ document.addEventListener('keydown',function(e){
 });
 
 /* ── QUESTION GENERATORS ── */
-function makeCalcQ(){
-  const plus=Math.random()<.5;
+function makePlusQ(){
   const max=selRange;
-  let a,b;
-  if(plus){a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(max-a+1));}
-  else{a=Math.floor(Math.random()*(max-1))+1;b=Math.floor(Math.random()*(a+1));}
-  return{type:'calc',text:a+(plus?' + ':' - ')+b+' = ?',ans:plus?a+b:a-b};
+  const a=Math.floor(Math.random()*(max-1))+1;
+  const b=Math.floor(Math.random()*(max-a+1));
+  return{type:'plus',text:a+' + '+b+' = ?',ans:a+b};
+}
+function makeMinusQ(){
+  const max=selRange;
+  const a=Math.floor(Math.random()*(max-1))+1;
+  const b=Math.floor(Math.random()*(a+1));
+  return{type:'minus',text:a+' - '+b+' = ?',ans:a-b};
 }
 function makeCmpQ(){
   const a=Math.floor(Math.random()*selRange)+1;
@@ -537,10 +549,10 @@ function makeDivQ(){
 /* ── GAME FLOW ── */
 function startGame(){
   lastMode=selMode;lastRange=selRange;lastCount=selCount;
-  const makers={calc:makeCalcQ,cmp:makeCmpQ,mul:makeMulQ,div:makeDivQ};
+  const makers={plus:makePlusQ,minus:makeMinusQ,cmp:makeCmpQ,mul:makeMulQ,div:makeDivQ};
   questions=Array.from({length:selCount},makers[selMode]);
   cur=0;ok=0;
-  const modeLabels={calc:'+ −',cmp:'> <',mul:'×',div:'÷'};
+  const modeLabels={plus:'+ SCITANI',minus:'- ODCITANI',cmp:'> <',mul:'×',div:'÷'};
   document.getElementById('qmode').textContent=modeLabels[selMode];
   document.getElementById('qrange').textContent='DO '+selRange;
   sndStart();show('s-quiz');loadQ();
@@ -550,7 +562,7 @@ function loadQ(){
   canInput=true;currentInput='';
   currentQ=questions[cur];
   document.getElementById('qtext').textContent=currentQ.text;
-  const decoMap={calc:DECOS_CALC,cmp:DECOS_CMP,mul:DECOS_MUL,div:DECOS_DIV};
+  const decoMap={plus:DECOS_CALC,minus:DECOS_CALC,cmp:DECOS_CMP,mul:DECOS_MUL,div:DECOS_DIV};
   document.getElementById('qdeco').textContent=decoMap[selMode][cur%8];
   document.getElementById('qcount').textContent='PRIKLAD '+(cur+1)+'/'+questions.length;
   document.getElementById('qscore').textContent='SPRAVNE: '+ok;
@@ -620,7 +632,7 @@ function showResult(){
   document.getElementById('prog').style.width='100%';
   const total=questions.length,pct=Math.round(ok/total*100);
   document.getElementById('rscore').textContent=ok+' / '+total;
-  const modeLabels={calc:'+ − DO '+lastRange,cmp:'POROVNAVANI DO '+lastRange,mul:'× KRAT DO '+lastRange,div:'÷ DELENO DO '+lastRange};
+  const modeLabels={plus:'+ SCITANI DO '+lastRange,minus:'- ODCITANI DO '+lastRange,cmp:'POROVNAVANI DO '+lastRange,mul:'× KRAT DO '+lastRange,div:'÷ DELENO DO '+lastRange};
   document.getElementById('rpct').textContent=pct+'%  |  '+modeLabels[lastMode];
   let face,msg;
   if(pct===100){face='🌟';msg='ABSOLUTNI JEDNICKA! MINECRAFT GENIUS!';}
