@@ -23,15 +23,15 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
 .mc-dirt-row{display:flex;height:16px;}
 .mc-dirt-block{flex:1;height:16px;background:#8B5E3C;border-right:1px solid #7a4f2e;}
 
-/* TABS — 3 across */
+/* TABS — 4 across, smaller text */
 .mode-tabs{display:flex;gap:0;max-width:380px;margin:10px auto 0;padding:0 8px;}
-.mode-tab{flex:1;background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:9px 2px 7px;cursor:pointer;text-align:center;transition:filter .1s;border-right:none;}
+.mode-tab{flex:1;background:#2c2c2c;border:3px solid;border-color:#666 #222 #222 #666;padding:8px 2px 6px;cursor:pointer;text-align:center;transition:filter .1s;border-right:none;}
 .mode-tab:last-child{border-right:3px solid #222;}
 .mode-tab:hover{filter:brightness(1.3);}
 .mode-tab.active-tab{background:#5a9e32;border-color:#7dc744 #2a5e12 #2a5e12 #7dc744;}
 .mode-tab.active-tab:last-child{border-right:3px solid #2a5e12;}
-.mode-tab .ti{font-size:18px;display:block;margin-bottom:2px;}
-.mode-tab .tl{font-size:9px;color:#ccc;letter-spacing:.3px;}
+.mode-tab .ti{font-size:16px;display:block;margin-bottom:2px;}
+.mode-tab .tl{font-size:8px;color:#ccc;letter-spacing:.2px;}
 .mode-tab.active-tab .tl{color:#fff;}
 
 .inv-label{font-size:12px;color:#aaa;text-align:center;margin:10px 0 6px;letter-spacing:1px;}
@@ -176,16 +176,19 @@ body{background:#0d0d1a;min-height:100vh;display:flex;align-items:flex-start;jus
       <span class="ti">➕</span><span class="tl">POCITANI</span>
     </div>
     <div class="mode-tab" onclick="pickMode('cmp',this)">
-      <span class="ti">⚖️</span><span class="tl">POROVNAVANI</span>
+      <span class="ti">⚖️</span><span class="tl">POROVNAN.</span>
     </div>
     <div class="mode-tab" onclick="pickMode('mul',this)">
-      <span class="ti">✖️</span><span class="tl">NASOBILKA</span>
+      <span class="ti">✖️</span><span class="tl">KRAT</span>
+    </div>
+    <div class="mode-tab" onclick="pickMode('div',this)">
+      <span class="ti">➗</span><span class="tl">DELENO</span>
     </div>
   </div>
 
   <div id="range-section">
     <div class="inv-label" id="range-label">[ OBTIZNOST ]</div>
-    <div class="range-row cols2" id="range-row"></div>
+    <div class="range-row" id="range-row"></div>
   </div>
 
   <div class="inv-label">[ POCET PRIKLADU ]</div>
@@ -285,6 +288,12 @@ const RANGE_CONFIGS={
   mul:[
     {val:20,icon:'⭐',label:'DO 20',sub:'nasobky 1-20'},
     {val:50,icon:'🔥',label:'DO 50',sub:'nasobky 1-50'},
+    {val:100,icon:'💎',label:'DO 100',sub:'nasobky 1-100'},
+  ],
+  div:[
+    {val:20,icon:'⭐',label:'DO 20',sub:'deleni do 20'},
+    {val:50,icon:'🔥',label:'DO 50',sub:'deleni do 50'},
+    {val:100,icon:'💎',label:'DO 100',sub:'deleni do 100'},
   ],
 };
 
@@ -355,6 +364,7 @@ const REWARD_THEMES=[
 const DECOS_CALC=['⛏️','💎','🪓','🗡️','🏹','🧱','🪨','🌲'];
 const DECOS_CMP=['⚖️','🔍','📏','🧮','🎯','🏆','⚔️','🛡️'];
 const DECOS_MUL=['✖️','🔢','🧮','📐','💡','⭐','🏆','🔥'];
+const DECOS_DIV=['➗','🔢','🧮','📐','💡','⭐','🏆','🔪'];
 const MSGS_OK=['SPRAVNE!','BRAVO!','SUPER!','JEDNICKA!','SKVELE!','PERFEKTNI!','UZASNE!','GENIALNI!'];
 const MSGS_NO=['SPATNE','SKODA','NEVADI!','PRISTE LIP!'];
 
@@ -407,6 +417,7 @@ let currentQ=null;
 function buildRangeButtons(){
   const cfg=RANGE_CONFIGS[selMode];
   const row=document.getElementById('range-row');
+  row.style.gridTemplateColumns=cfg.length===3?'1fr 1fr 1fr':'1fr 1fr';
   row.innerHTML=cfg.map(r=>
     `<div class="range-btn" onclick="pickRange(${r.val},this)">
       <div class="ri">${r.icon}</div>
@@ -429,7 +440,8 @@ function updateSubtitle(){
   const r=selRange||'?';
   if(selMode==='calc') document.getElementById('hdr-sub').textContent='+  -  DO  '+r;
   else if(selMode==='cmp') document.getElementById('hdr-sub').textContent='VETSI  MENSI  DO  '+r;
-  else document.getElementById('hdr-sub').textContent='x  ÷  DO  '+r;
+  else if(selMode==='mul') document.getElementById('hdr-sub').textContent='x  (KRAT)  DO  '+r;
+  else document.getElementById('hdr-sub').textContent='÷  (DELENO)  DO  '+r;
 }
 function pickRange(n,el){
   selRange=n;
@@ -502,36 +514,34 @@ function makeCmpQ(){
   return{type:'cmp',text:a+' ___ '+b,a,b,ans};
 }
 function makeMulQ(){
-  const max=selRange;
-  const doDiv=Math.random()<.5;
-  if(doDiv){
-    // pick a*b first, present as (a*b) ÷ a = ?
-    const a=Math.floor(Math.random()*10)+1;
-    const b=Math.floor(Math.random()*10)+1;
-    const product=a*b;
-    if(product>max){
-      // fallback to multiplication
-      const x=Math.floor(Math.random()*10)+1;
-      const y=Math.floor(Math.random()*Math.floor(max/x))+1;
-      return{type:'mul',text:x+' × '+y+' = ?',ans:x*y};
-    }
-    return{type:'mul',text:product+' ÷ '+a+' = ?',ans:b};
-  }else{
-    const a=Math.floor(Math.random()*10)+1;
-    const maxB=Math.floor(max/a);
-    const b=maxB<1?1:Math.floor(Math.random()*maxB)+1;
-    return{type:'mul',text:a+' × '+b+' = ?',ans:a*b};
-  }
+  // pure multiplication: a × b = ? where a*b <= selRange
+  const a=Math.floor(Math.random()*10)+1;
+  const maxB=Math.max(1,Math.floor(selRange/a));
+  const b=Math.floor(Math.random()*maxB)+1;
+  return{type:'mul',text:a+' × '+b+' = ?',ans:a*b};
+}
+function makeDivQ(){
+  // pure division (no remainder): (a*b) ÷ a = b, product <= selRange
+  let a,b,product;
+  let tries=0;
+  do{
+    a=Math.floor(Math.random()*10)+1;
+    b=Math.floor(Math.random()*10)+1;
+    product=a*b;
+    tries++;
+  }while(product>selRange&&tries<50);
+  if(product>selRange){a=1;b=Math.min(selRange,9);product=b;}
+  return{type:'div',text:product+' ÷ '+a+' = ?',ans:b};
 }
 
 /* ── GAME FLOW ── */
 function startGame(){
   lastMode=selMode;lastRange=selRange;lastCount=selCount;
-  let maker=selMode==='calc'?makeCalcQ:selMode==='cmp'?makeCmpQ:makeMulQ;
-  questions=Array.from({length:selCount},maker);
+  const makers={calc:makeCalcQ,cmp:makeCmpQ,mul:makeMulQ,div:makeDivQ};
+  questions=Array.from({length:selCount},makers[selMode]);
   cur=0;ok=0;
-  const modeLabel=selMode==='calc'?'+ −':selMode==='cmp'?'> <':'× ÷';
-  document.getElementById('qmode').textContent=modeLabel;
+  const modeLabels={calc:'+ −',cmp:'> <',mul:'×',div:'÷'};
+  document.getElementById('qmode').textContent=modeLabels[selMode];
   document.getElementById('qrange').textContent='DO '+selRange;
   sndStart();show('s-quiz');loadQ();
 }
@@ -540,8 +550,8 @@ function loadQ(){
   canInput=true;currentInput='';
   currentQ=questions[cur];
   document.getElementById('qtext').textContent=currentQ.text;
-  const decos=selMode==='calc'?DECOS_CALC:selMode==='cmp'?DECOS_CMP:DECOS_MUL;
-  document.getElementById('qdeco').textContent=decos[cur%decos.length];
+  const decoMap={calc:DECOS_CALC,cmp:DECOS_CMP,mul:DECOS_MUL,div:DECOS_DIV};
+  document.getElementById('qdeco').textContent=decoMap[selMode][cur%8];
   document.getElementById('qcount').textContent='PRIKLAD '+(cur+1)+'/'+questions.length;
   document.getElementById('qscore').textContent='SPRAVNE: '+ok;
   document.getElementById('fb').textContent='';
@@ -610,8 +620,8 @@ function showResult(){
   document.getElementById('prog').style.width='100%';
   const total=questions.length,pct=Math.round(ok/total*100);
   document.getElementById('rscore').textContent=ok+' / '+total;
-  const modeStr=lastMode==='calc'?'+ − DO '+lastRange:lastMode==='cmp'?'POROVNAVANI DO '+lastRange:'× ÷ DO '+lastRange;
-  document.getElementById('rpct').textContent=pct+'%  |  '+modeStr;
+  const modeLabels={calc:'+ − DO '+lastRange,cmp:'POROVNAVANI DO '+lastRange,mul:'× KRAT DO '+lastRange,div:'÷ DELENO DO '+lastRange};
+  document.getElementById('rpct').textContent=pct+'%  |  '+modeLabels[lastMode];
   let face,msg;
   if(pct===100){face='🌟';msg='ABSOLUTNI JEDNICKA! MINECRAFT GENIUS!';}
   else if(pct>=80){face='😀';msg='VYBORNE! SKORO PERFEKTNI!';}
